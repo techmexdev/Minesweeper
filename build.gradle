@@ -1,0 +1,43 @@
+apply plugin: 'java'
+apply plugin: 'jacoco'
+
+dependencies {
+  testCompile group: 'junit', name: 'junit', version: "4.+"
+}
+
+repositories {
+  mavenCentral()
+}
+
+compileJava {
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+}
+
+compileTestJava {
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+}
+
+sourceSets.main.java.srcDirs = ['Minesweeper/src']
+sourceSets.test.java.srcDirs = ['Minesweeper/test']
+
+jacocoTestReport {
+  doFirst{
+    classDirectories = fileTree(
+            dir: './build/classes/main/game',
+            excludes: ['**/ui/*.class']
+    )
+  }
+
+  reports {
+    xml.enabled false
+    csv.enabled false
+    html.destination "build/reports/coverageHtml"
+  }
+}
+
+task(runui, dependsOn: 'classes', type: JavaExec) {
+  main = 'game.ui.MineSweeperGUI'
+  classpath = sourceSets.main.runtimeClasspath
+}
+
+defaultTasks 'clean', 'test', 'jacocoTestReport'
